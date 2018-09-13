@@ -10,6 +10,7 @@ module Dragonfly
       @project = opts[:project]
       @keyfile = opts[:keyfile]
       @bucket_name = opts[:bucket]
+      @domain = opts[:domain]
     end
 
     def write(object, opts = {})
@@ -56,6 +57,11 @@ module Dragonfly
 
     def storage
       @storage ||= Google::Cloud::Storage.new(project: project, keyfile: keyfile)
+    end
+
+    def url_for(uid, opts={})
+      return nil if @domain.nil?
+      "https://#{@domain}/#{uid}"
     end
   end
 end
