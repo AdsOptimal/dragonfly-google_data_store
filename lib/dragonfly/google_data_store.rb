@@ -11,12 +11,13 @@ module Dragonfly
       @keyfile = opts[:keyfile]
       @bucket_name = opts[:bucket]
       @domain = opts[:domain]
+      @root_path = opts[:root_path]
     end
 
     def write(object, opts = {})
       ensure_bucket_exists
 
-      uid = opts[:path] || Dragonfly::GoogleDataStore.generate_uid
+      uid = opts[:path] || generate_uid(object.name || 'file')
 
       bucket.create_file object.tempfile.path, uid, metadata: object.meta
 
@@ -41,8 +42,8 @@ module Dragonfly
       nil
     end
 
-    def self.generate_uid
-      "#{Time.now.strftime('%Y/%m/%d/%H/%M')}/#{SecureRandom.uuid}"
+    def self.generate_uid(name)
+      "#{Time.now.strftime '%Y/%m/%d/%H/%M/%S'}/#{SecureRandom.uuid}/#{name}"
     end
 
     def url_for(uid, opts={})
@@ -62,6 +63,10 @@ module Dragonfly
 
     def storage
       @storage ||= Google::Cloud::Storage.new(project: project, keyfile: keyfile)
+    end
+
+    def full_path(uid)
+      File.join *[root_path, uid].compact
     end
   end
 end
