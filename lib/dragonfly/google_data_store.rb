@@ -45,6 +45,11 @@ module Dragonfly
       "#{Time.now.strftime('%Y/%m/%d/%H/%M')}/#{SecureRandom.uuid}"
     end
 
+    def url_for(uid, opts={})
+      return nil if @domain.nil?
+      "https://#{@domain}/#{uid}"
+    end
+
     private
 
     def bucket
@@ -57,11 +62,6 @@ module Dragonfly
 
     def storage
       @storage ||= Google::Cloud::Storage.new(project: project, keyfile: keyfile)
-    end
-
-    def url_for(uid, opts={})
-      return nil if @domain.nil?
-      "https://#{@domain}/#{uid}"
     end
   end
 end
